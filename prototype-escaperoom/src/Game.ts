@@ -3,6 +3,7 @@ import Phaser from 'phaser'
 export default class Game extends Phaser.Scene 
 {
 	private player?: Phaser.GameObjects.Sprite
+	private boxes: Phaser.GameObjects.Sprite[] = []
 
 	private cursors?: Phaser.Types.Input.Keyboard.CursorKeys
 	
@@ -23,11 +24,15 @@ export default class Game extends Phaser.Scene
 	create() 
 	{
 		//level layout
+		// 52 = player
+		// 100 = brown boxes
+		// 51 = blue diamond
+		// 8 = blue box
 		const level = [
 			[100, 	 100, 	100, 	100, 	100, 	100, 	  100, 	  100,		100,	100,],
 			[100, 	   0, 	  0, 	  0, 	  0, 	  0, 		0, 		0,		0,		100,],
 			[100,	   0, 	  0, 	  0, 	  0, 	  0, 		0, 		0,		0,		100,],
-			[100,	   0, 	  0, 	 51, 	  8,      0, 		0, 		0,		0,		100,],
+			[100,	   0, 	  0, 	 51, 	  8,      52, 		0, 		0,		0,		100,],
 			[100,	   0, 	  0, 	  0, 	  0, 	  0, 		0, 		0,		0,		100,],
 			[100,	   0, 	  0, 	  0, 	  0, 	  0, 		0, 		0,		0,		100,],
 			[100,	   0, 	  0, 	  0,	  0, 	  0, 		0, 		0,		0,		100,],
@@ -43,9 +48,62 @@ export default class Game extends Phaser.Scene
 		const tiles = map.addTilesetImage('tiles')
 		const layer = map.createStaticLayer(0, tiles, 0, 0)
 
-		this.player = this.add.sprite(400, 300, 'tiles', 52)
+		this.player = layer.createFromTiles(52, 0, { key: 'tiles', frame:52 }).pop()
+		this.player.setOrigin(0)
 		
-		//player walking and idle animations
+		
+		this.createPlayerAnims()
+
+		this.boxes = layer.createFromTiles(8, 0, {key: 'tiles', frame: 8 })
+			.map(box => box.setOrigin(0))
+	}
+
+	update()
+	{
+		//the walking animations
+		if (!this.cursors || !this.player)
+		{
+			return
+		}
+		if (this.cursors.left.isDown)
+		{
+			this.player.anims.play('left', true)
+		}
+		else if (this.cursors.right.isDown)
+		{
+			this.player.anims.play('right', true)
+		}
+		else if (this.cursors.up.isDown)
+		{
+			this.player.anims.play('up', true)
+		}
+		else if (this.cursors.down.isDown)
+		{
+			this.player.anims.play('down', true)
+		}
+		else if (this.player.anims.currentAnim)
+		{
+			const key = this.player?.anims.currentAnim?.key
+			if (!key.startsWith(`idle-`))
+			{
+				this.player.anims.play(`idle-${key}`, true)
+			}
+			
+		}
+	}
+
+	private getBoxAt(x: number, y: number)
+	{
+		return this.boxes.find(box => {
+			const rect = box.getBounds()
+			return rect.contains(x, y)
+		})
+	}
+
+
+	//player walking and idle animations
+	private createPlayerAnims()
+	{
 		this.anims.create({
 			key: 'idle-down',
 			frames: [ {key: 'tiles', frame: 52} ]
@@ -89,39 +147,5 @@ export default class Game extends Phaser.Scene
 			frameRate: 10,
 			repeat: -1
 		})
-	}
-
-	update()
-	{
-		//the walking animations
-		if (!this.cursors || !this.player)
-		{
-			return
-		}
-		if (this.cursors.left.isDown)
-		{
-			this.player.anims.play('left', true)
-		}
-		else if (this.cursors.right.isDown)
-		{
-			this.player.anims.play('right', true)
-		}
-		else if (this.cursors.up.isDown)
-		{
-			this.player.anims.play('up', true)
-		}
-		else if (this.cursors.down.isDown)
-		{
-			this.player.anims.play('down', true)
-		}
-		else if (this.player.anims.currentAnim)
-		{
-			const key = this.player?.anims.currentAnim?.key
-			if (!key.startsWith(`idle-`))
-			{
-				this.player.anims.play(`idle-${key}`, true)
-			}
-			
-		}
 	}
 }
