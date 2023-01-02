@@ -32,7 +32,7 @@ export default class Game extends Phaser.Scene
 			[100, 	 100, 	100, 	100, 	100, 	100, 	  100, 	  100,		100,	100,],
 			[100, 	   0, 	  0, 	  0, 	  0, 	  0, 		0, 		0,		0,		100,],
 			[100,	   0, 	  0, 	  0, 	  0, 	  0, 		0, 		0,		0,		100,],
-			[100,	   0, 	  0, 	 51, 	  8,      52, 		0, 		0,		0,		100,],
+			[100,	   0, 	  0, 	 51, 	  8,      0, 	   52, 		0,		0,		100,],
 			[100,	   0, 	  0, 	  0, 	  0, 	  0, 		0, 		0,		0,		100,],
 			[100,	   0, 	  0, 	  0, 	  0, 	  0, 		0, 		0,		0,		100,],
 			[100,	   0, 	  0, 	  0,	  0, 	  0, 		0, 		0,		0,		100,],
@@ -65,30 +65,110 @@ export default class Game extends Phaser.Scene
 		{
 			return
 		}
-		if (this.cursors.left.isDown)
+
+		const justLeft = Phaser.Input.Keyboard.JustDown(this.cursors.left!)
+		const justRight = Phaser.Input.Keyboard.JustDown(this.cursors.right!)
+		const justDown = Phaser.Input.Keyboard.JustDown(this.cursors.down!)
+		const justUp = Phaser.Input.Keyboard.JustDown(this.cursors.up!)
+		
+
+		if (justLeft)
 		{
-			this.player.anims.play('left', true)
-		}
-		else if (this.cursors.right.isDown)
-		{
-			this.player.anims.play('right', true)
-		}
-		else if (this.cursors.up.isDown)
-		{
-			this.player.anims.play('up', true)
-		}
-		else if (this.cursors.down.isDown)
-		{
-			this.player.anims.play('down', true)
-		}
-		else if (this.player.anims.currentAnim)
-		{
-			const key = this.player?.anims.currentAnim?.key
-			if (!key.startsWith(`idle-`))
-			{
-				this.player.anims.play(`idle-${key}`, true)
-			}
+			const box = this.getBoxAt(this.player.x - 32, this.player.y)
 			
+			const baseTween = {
+				x: '-=64',
+				duration: 500
+			}
+
+			this.tweenMove(box, baseTween,() => {
+				this.player.anims.play('left', true)
+			} )
+		}
+		else if (justRight)
+		{
+			const box = this.getBoxAt(this.player.x + 96, this.player.y)
+			const baseTween = {
+				x: '+=64',
+				duration: 500
+			}
+
+			this.tweenMove(box, baseTween, () => {
+				this.player.anims.play('right', true)
+			})
+
+		}
+		else if (justUp)
+		{
+			const box = this.getBoxAt(this.player.x, this.player.y - 32)
+			const baseTween = {
+				y: '-=64',
+				duration: 500
+			}
+
+			this.tweenMove(box, baseTween, () => {
+				this.player.anims.play('up', true)
+			})
+			
+
+		}
+		else if (justDown)
+		{
+			const box = this.getBoxAt(this.player.x, this.player.y + 96)
+			const baseTween = {
+				y: '+=64',
+				duration: 500
+			}
+
+			this.tweenMove(box, baseTween, () => {
+				this.player.anims.play('down', true)
+			})
+			
+		}
+		// else if (this.player.anims.currentAnim)
+		// {
+		// 	const key = this.player?.anims.currentAnim?.key
+		// 	if (!key.startsWith(`idle-`))
+		// 	{
+		// 		this.player.anims.play(`idle-${key}`, true)
+		// 	}
+			
+		// }
+	}
+
+	private tweenMove(box: Phaser.GameObjects.Sprite |undefined, baseTween: any, onStart:() => void)
+	{
+		if (box)
+			{
+				this.tweens.add(Object.assign(
+					baseTween,
+					{
+						targets:box
+					}
+				))
+			}
+		
+			this.tweens.add(Object.assign(
+				baseTween,
+				{
+					targets:this.player,
+					onComplete: this.stopPlayerAnimation,
+					onCompleteScope:this,
+					onStart
+				}
+			))
+	}
+
+	private stopPlayerAnimation()
+	{
+		if (!this.player)
+		{
+			return
+		}
+		const key = this.player?.anims.currentAnim?.key
+		if (!key.startsWith(`idle-`))
+		{
+			this.player.anims.play(`idle-${key}`, true)
 		}
 	}
 
