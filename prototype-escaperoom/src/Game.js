@@ -15,6 +15,24 @@ export default class Game extends Phaser.Scene {
 
 	create() 
 	{
-		this.add.image(400, 300, 'tiles', 1 )
+		const level = [
+			[100, 	 100, 	100, 	100, 	100, 	100, 	  100, 	  100,		100,	100,],
+			[100, 	   0, 	  0, 	  0, 	  0, 	  0, 		0, 		0,		0,		100,],
+			[100,	   0, 	  0, 	  0, 	  0, 	  0, 		0, 		0,		0,		100,],
+			[100,	   0, 	  0, 	 51, 	  8,      0, 		0, 		0,		0,		100,],
+			[100,	   0, 	  0, 	  0, 	  0, 	  0, 		0, 		0,		0,		100,],
+			[100,	   0, 	  0, 	  0, 	  0, 	  0, 		0, 		0,		0,		100,],
+			[100,	   0, 	  0, 	  0,	  0, 	  0, 		0, 		0,		0,		100,],
+			[100,	 100,	100, 	100,	100, 	100, 	  100, 	  100,		100,	100,]
+		]
+
+		const map = this.make.tilemap({ 
+			data: level, 
+			tileWidth:64, 
+			tileHeight:64
+		})
+
+		const tiles = map.addTilesetImage('tiles')
+		const layer = map.createStaticLayer(0, tiles, 0, 0)
 	}
 }
