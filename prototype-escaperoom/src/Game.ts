@@ -2,9 +2,12 @@ import Phaser from 'phaser'
 
 export default class Game extends Phaser.Scene 
 {
+	private player?: Phaser.GameObjects.Sprite
+
+	private cursors?: Phaser.Types.Input.Keyboard.CursorKeys
 	
 	constructor() {
-		super('hello-world')
+		super('game')
 	}
 
 	preload() 
@@ -40,7 +43,7 @@ export default class Game extends Phaser.Scene
 		const tiles = map.addTilesetImage('tiles')
 		const layer = map.createStaticLayer(0, tiles, 0, 0)
 
-		this.add.sprite(400, 300, 'tiles', 52)
+		this.player = this.add.sprite(400, 300, 'tiles', 52)
 
 		//player walking animations
 		this.anims.create({
@@ -53,6 +56,13 @@ export default class Game extends Phaser.Scene
 
 	update()
 	{
-		
+		if (!this.cursors || !this.player)
+		{
+			return
+		}
+		if (this.cursors.left.isDown)
+		{
+			this.player.anims.play('left')
+		}
 	}
 }
