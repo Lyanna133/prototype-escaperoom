@@ -5,11 +5,16 @@ export default class Game extends Phaser.Scene {
 		super('hello-world')
 	}
 
-	preload() {
-		
+	preload() 
+	{
+		this.load.spritesheet('tiles', 'assets/sokoban_tilesheet.png', {
+			frameWidth: 64,
+			startFrame:0
+		})
 	}
 
-	create() {
-		
+	create() 
+	{
+		this.add.image(400, 300, 'tiles', 1 )
 	}
 }
