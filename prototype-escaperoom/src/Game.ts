@@ -10,16 +10,24 @@ import {offsetForDirection} from '../src/utils/TileUtils'
 export default class Game extends Phaser.Scene 
 {
 	private player?: Phaser.GameObjects.Sprite
-	
 	private layer?: Phaser.Tilemaps.StaticTilemapLayer 
+	private movesCountLabel?: Phaser.GameObjects.Text
 
 	private targetsCoveredByColor: { [key: number]: number } = {}
 	private boxesByColor: {[key:number]:Phaser.GameObjects.Sprite[] } = {}
 
 	private cursors?: Phaser.Types.Input.Keyboard.CursorKeys
+
+	private movesCount = 0
 	
 	constructor() {
 		super('game')
+	}
+
+	// reset moves to 0 instead of keep what you had if you play again
+	init()
+	{
+		this.movesCount = 0
 	}
 
 	preload() 
@@ -45,7 +53,7 @@ export default class Game extends Phaser.Scene
 			[	0,	   0, 	  100, 	  0, 	 	100, 	  100, 		100, 	100,	0,		0,],
 			[100,	  100, 	  100, 	  9, 	 	  0,     	9, 	   	64, 	100,	0,		0,],
 			[100,	   64, 	  0, 	  9, 	  	 52, 	  100, 		100, 	100,	0,		0,],
-			[100,	  100, 	  100, 	  100, 	 	 9, 	  100, 		0, 		0,		0,		0,],
+			[100,	  100, 	  100, 	  100, 	 	  9, 	  100, 		0, 		0,		0,		0,],
 			[	0,	   0, 	  0, 	  100,	  	 64, 	  100, 		0, 		0,		0,		0,],
 			[	0,	   0,	  0, 	  100,		100, 	  100, 	  	0, 	  	0,		0,		0,]
 		]
@@ -64,10 +72,12 @@ export default class Game extends Phaser.Scene
 		this.player = this.layer.createFromTiles(52, 0, { key: 'tiles', frame:52 }).pop()
 		this.player.setOrigin(0)
 		
-		
 		this.createPlayerAnims()
 
 		this.extractBoxes(this.layer)
+
+		//show number off moves
+		this.movesCountLabel = this.add.text( 540, 10, `Moves: ${this.movesCount}`)
 	}
 
 	update()
@@ -257,14 +267,27 @@ export default class Game extends Phaser.Scene
 				baseTween,
 				{
 					targets:this.player,
-					onComplete: this.stopPlayerAnimation,
-					onCompleteScope:this,
+					onComplete:() => {
+						this.movesCount++			//counting moves
+						this.stopPlayerAnimation()
+
+						this.updateMovesCount()
+					},
+					
 					onStart
 				}
 			))
-
-		
 	}
+
+	private updateMovesCount()
+	{
+		if (!this.movesCountLabel)
+		{
+			return
+		}
+		this.movesCountLabel.text = `Moves: ${this.movesCount}`
+	}
+
 	// if the player stops moving stop the animation
 	private stopPlayerAnimation()
 	{
