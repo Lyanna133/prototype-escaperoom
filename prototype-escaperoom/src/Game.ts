@@ -1,9 +1,10 @@
 import Phaser from 'phaser'
-
+// GEINDIGD BIJ PART 
 export default class Game extends Phaser.Scene 
 {
 	private player?: Phaser.GameObjects.Sprite
-	private boxes: Phaser.GameObjects.Sprite[] = []
+	private boxes?: Phaser.GameObjects.Sprite[] = []
+	private layer?: Phaser.Tilemaps.StaticTilemapLayer 
 
 	private cursors?: Phaser.Types.Input.Keyboard.CursorKeys
 	
@@ -46,15 +47,17 @@ export default class Game extends Phaser.Scene
 		})
 
 		const tiles = map.addTilesetImage('tiles')
-		const layer = map.createStaticLayer(0, tiles, 0, 0)
+		this.layer = map.createStaticLayer(0, tiles, 0, 0)
 
-		this.player = layer.createFromTiles(52, 0, { key: 'tiles', frame:52 }).pop()
+		// layer.getTileAtWorldXY()
+
+		this.player = this.layer.createFromTiles(52, 0, { key: 'tiles', frame:52 }).pop()
 		this.player.setOrigin(0)
 		
 		
 		this.createPlayerAnims()
 
-		this.boxes = layer.createFromTiles(8, 0, {key: 'tiles', frame: 8 })
+		this.boxes = this.layer.createFromTiles(8, 0, {key: 'tiles', frame: 8 })
 			.map(box => box.setOrigin(0))
 	}
 
@@ -74,39 +77,41 @@ export default class Game extends Phaser.Scene
 
 		if (justLeft)
 		{
-			const box = this.getBoxAt(this.player.x - 32, this.player.y)
 			
 			const baseTween = {
 				x: '-=64',
 				duration: 500
 			}
 
-			this.tweenMove(box, baseTween,() => {
+			this.tweenMove(this.player.x - 31, this.player.y + 32, baseTween,() => {
 				this.player.anims.play('left', true)
 			} )
 		}
 		else if (justRight)
 		{
-			const box = this.getBoxAt(this.player.x + 96, this.player.y)
+			
 			const baseTween = {
 				x: '+=64',
 				duration: 500
 			}
 
-			this.tweenMove(box, baseTween, () => {
+			this.tweenMove(this.player.x + 95, this.player.y + 32, baseTween, () => {
 				this.player.anims.play('right', true)
 			})
 
 		}
 		else if (justUp)
 		{
-			const box = this.getBoxAt(this.player.x, this.player.y - 32)
+			const nx = this.player.x + 32
+			const ny = this.player.y - 32
+			
+
 			const baseTween = {
 				y: '-=64',
 				duration: 500
 			}
 
-			this.tweenMove(box, baseTween, () => {
+			this.tweenMove(this.player.x + 32, this.player.y - 32, baseTween, () => {
 				this.player.anims.play('up', true)
 			})
 			
@@ -114,13 +119,13 @@ export default class Game extends Phaser.Scene
 		}
 		else if (justDown)
 		{
-			const box = this.getBoxAt(this.player.x, this.player.y + 96)
+			
 			const baseTween = {
 				y: '+=64',
 				duration: 500
 			}
 
-			this.tweenMove(box, baseTween, () => {
+			this.tweenMove(this.player.x + 32, this.player.y + 95, baseTween, () => {
 				this.player.anims.play('down', true)
 			})
 			
@@ -136,8 +141,21 @@ export default class Game extends Phaser.Scene
 		// }
 	}
 
-	private tweenMove(box: Phaser.GameObjects.Sprite |undefined, baseTween: any, onStart:() => void)
+	private tweenMove(x: number, y: number, baseTween: any, onStart:() => void)
 	{
+		if(this.tweens.isTweening(this.player!))
+		{
+			return
+		}
+
+		const hasWall = this.hasWallAt(x,y)
+
+			if (hasWall)
+			{
+				return
+			}
+
+		const box = this.getBoxAt(x, y)
 		if (box)
 			{
 				this.tweens.add(Object.assign(
@@ -157,6 +175,8 @@ export default class Game extends Phaser.Scene
 					onStart
 				}
 			))
+
+		
 	}
 
 	private stopPlayerAnimation()
@@ -178,6 +198,20 @@ export default class Game extends Phaser.Scene
 			const rect = box.getBounds()
 			return rect.contains(x, y)
 		})
+	}
+
+	private hasWallAt(x: number, y: number)
+	{
+		if (!this.layer)
+		{
+			return false
+		}
+		const tile = this.layer.getTileAtWorldXY(x, y)
+		if (!tile)
+		{
+			return false
+		}
+		return tile.index === 100
 	}
 
 
