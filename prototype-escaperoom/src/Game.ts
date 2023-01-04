@@ -6,6 +6,7 @@ import {Direction} from '../src/consts/Direction'
 
 import {boxColorToTargetColor, targetColorToBoxColor } from '../src/utils/ColorUtils'
 import {offsetForDirection} from '../src/utils/TileUtils'
+import {baseTweenForDirection} from '../src/utils/TweenUtils'
 
 export default class Game extends Phaser.Scene 
 {
@@ -247,6 +248,8 @@ export default class Game extends Phaser.Scene
 					this.changeTargetCoveredCountForColor(targetColor, -1)
 				}
 
+				const baseTween = baseTweenForDirection(direction)
+
 				this.tweens.add(Object.assign(
 					baseTween,
 					{
@@ -256,9 +259,7 @@ export default class Game extends Phaser.Scene
 							if (coveredTarget)
 							{
 								this.changeTargetCoveredCountForColor(targetColor,1)
-							}
-							
-							
+							}	
 						}
 					}
 				))
@@ -268,25 +269,27 @@ export default class Game extends Phaser.Scene
 				baseTween,
 				{
 					targets:this.player,
-					onComplete:() => {
-						this.movesCount++			//counting moves
-						this.stopPlayerAnimation()
-
-						this.updateMovesCount()
-						const levelFinished = this.allTargetsCovered()
-						if (levelFinished)
-						{
-							this.scene.start ('level-finished', {
-								moves: this.movesCount
-							})
-								
-						}
-					},
-					
+					onComplete: this.handlePlayerStopped,
+					onCompleteScope: this,
 					onStart
 				}
 			))
 	}
+
+	private handlePlayerStopped()
+	{
+		this.movesCount++			//counting moves
+		this.stopPlayerAnimation() // stopping of player animation
+		this.updateMovesCount()
+			const levelFinished = this.allTargetsCovered()
+			if (levelFinished)
+			{
+				this.scene.start ('level-finished', {
+					moves: this.movesCount
+				})
+			}
+	}
+
 
 	private updateMovesCount()
 	{
