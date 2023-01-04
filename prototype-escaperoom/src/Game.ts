@@ -103,7 +103,7 @@ export default class Game extends Phaser.Scene
 				duration: 500
 			}
 
-			this.tweenMove(Direction.Left, baseTween,() => {
+			this.tweenMove(Direction.Left,() => {
 				this.player.anims.play('left', true)
 			} )
 		}
@@ -115,7 +115,7 @@ export default class Game extends Phaser.Scene
 				duration: 500
 			}
 
-			this.tweenMove(Direction.Right, baseTween, () => {
+			this.tweenMove(Direction.Right, () => {
 				this.player.anims.play('right', true)
 			})
 
@@ -131,7 +131,7 @@ export default class Game extends Phaser.Scene
 				duration: 500
 			}
 
-			this.tweenMove(Direction.Up, baseTween, () => {
+			this.tweenMove(Direction.Up, () => {
 				this.player.anims.play('up', true)
 			})
 			
@@ -140,12 +140,7 @@ export default class Game extends Phaser.Scene
 		else if (justDown)
 		{
 			
-			const baseTween = {
-				y: '+=64',
-				duration: 500
-			}
-
-			this.tweenMove(Direction.Down, baseTween, () => {
+			this.tweenMove(Direction.Down, () => {
 				this.player.anims.play('down', true)
 			})
 			
@@ -199,7 +194,7 @@ export default class Game extends Phaser.Scene
 	}
 
 	// TWEEN MOVE METHOD //
-	private tweenMove(direction: Direction, baseTween: any, onStart:() => void)
+	private tweenMove(direction: Direction, onStart:() => void)
 	{
 		if( !this.player || this.tweens.isTweening(this.player!))
 		{
@@ -219,6 +214,7 @@ export default class Game extends Phaser.Scene
 			{
 				return
 			}
+		const baseTween = baseTweenForDirection(direction)
 
 		const boxData = this.getBoxDataAt(ox, oy)
 		if (boxData)
@@ -248,7 +244,7 @@ export default class Game extends Phaser.Scene
 					this.changeTargetCoveredCountForColor(targetColor, -1)
 				}
 
-				const baseTween = baseTweenForDirection(direction)
+				
 
 				this.tweens.add(Object.assign(
 					baseTween,
