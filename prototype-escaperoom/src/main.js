@@ -1,7 +1,7 @@
 import Phaser from 'phaser'
 
 import Game from './Game'
-import LevelFinishedScene from './LevelFinishedscene'
+import LevelFinishedScene from './LevelFinishedScene'
 
 
 const config = {

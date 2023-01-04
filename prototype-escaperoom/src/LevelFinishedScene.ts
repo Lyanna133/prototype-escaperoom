@@ -14,7 +14,7 @@ export default class LevelFinishedScene extends Phaser.Scene
 
         
         this.add.text( width * 0.5, height * 0.5, 'Level Complete!', {
-            
+            fontSize: 48
         }) 
         .setOrigin(0.5)
         

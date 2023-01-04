@@ -258,14 +258,7 @@ export default class Game extends Phaser.Scene
 								this.changeTargetCoveredCountForColor(targetColor,1)
 							}
 							
-							const levelFinished = this.allTargetsCovered()
-							if (levelFinished)
-							{
-								this.scene.start ('level-finished', {
-									moves: this.movesCount
-								})
-								
-							}
+							
 						}
 					}
 				))
@@ -280,6 +273,14 @@ export default class Game extends Phaser.Scene
 						this.stopPlayerAnimation()
 
 						this.updateMovesCount()
+						const levelFinished = this.allTargetsCovered()
+						if (levelFinished)
+						{
+							this.scene.start ('level-finished', {
+								moves: this.movesCount
+							})
+								
+						}
 					},
 					
 					onStart
