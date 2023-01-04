@@ -6,10 +6,11 @@ import * as Colors from '../src/consts/Color'
 export default class Game extends Phaser.Scene 
 {
 	private player?: Phaser.GameObjects.Sprite
-	private blueBoxes?: Phaser.GameObjects.Sprite[] = []
+	// private blueBoxes: Phaser.GameObjects.Sprite[] = []
 	private layer?: Phaser.Tilemaps.StaticTilemapLayer 
 
 	private targetsCoveredByColor: { [key: number]: number } = {}
+	private boxesByColor: {[key:number]:Phaser.GameObjects.Sprite[] } = {}
 
 	private cursors?: Phaser.Types.Input.Keyboard.CursorKeys
 	
@@ -37,8 +38,8 @@ export default class Game extends Phaser.Scene
 		const level = [
 			[100, 	 100, 	100, 	100, 	100, 	100, 	  100, 	  100,		100,	100,],
 			[100, 	   0, 	  0, 	  0, 	  0, 	  0, 		0, 		0,		0,		100,],
-			[100,	   0, 	  0, 	  0, 	  0, 	  0, 		0, 		0,		0,		100,],
-			[100,	   0, 	  0, 	 51, 	  8,      0, 	   52, 		0,		0,		100,],
+			[100,	   6, 	  7, 	  8, 	  9, 	  10, 		0, 		0,		0,		100,],
+			[100,	   25, 	  38, 	 51, 	  64,     77, 	   52, 		0,		0,		100,],
 			[100,	   0, 	  0, 	  0, 	  0, 	  0, 		0, 		0,		0,		100,],
 			[100,	   0, 	  0, 	  0, 	  0, 	  0, 		0, 		0,		0,		100,],
 			[100,	   0, 	  0, 	  0,	  0, 	  0, 		0, 		0,		0,		100,],
@@ -62,8 +63,7 @@ export default class Game extends Phaser.Scene
 		
 		this.createPlayerAnims()
 
-		this.blueBoxes = this.layer.createFromTiles(8, 0, {key: 'tiles', frame: 8 })
-			.map(box => box.setOrigin(0))
+		this.extractBoxes(this.layer)
 	}
 
 	update()
@@ -138,6 +138,24 @@ export default class Game extends Phaser.Scene
 	
 	}
 
+	private extractBoxes(layer: Phaser.Tilemaps.StaticTilemapLayer) //Zegt dat het niet bekend is maar wordt wel veel gebruikt!!
+	{
+		const boxColors = [
+			Colors.BoxOrange,
+			Colors.BoxRed,
+			Colors.BoxBlue,
+			Colors.BoxGreen,
+			Colors.BoxGrey
+		]
+
+		boxColors.forEach(color => {
+			this.boxesByColor[color] = layer.createFromTiles(color, 0, {key: 'tiles', frame: color })
+				.map(box => box.setOrigin(0))
+			
+		})
+		console.dir(this.boxesByColor)
+	}
+
 	private tweenMove(x: number, y: number, baseTween: any, onStart:() => void)
 	{
 		if(this.tweens.isTweening(this.player!))
@@ -152,13 +170,15 @@ export default class Game extends Phaser.Scene
 				return
 			}
 
-		const box = this.getBoxAt(x, y)
-		if (box)
+		const boxData = this.getBoxDataAt(x, y)
+		if (boxData)
 			{
-				const coveredTarget = this.hasTargetAt(box.x, box.y, Colors.TargetBlue)
+				const box = boxData.box
+				const color = boxData.color
+				const coveredTarget = this.hasTargetAt(box.x, box.y, color)
 				if(coveredTarget)
 				{
-					this.changeTargetCoveredCountForColor(Colors.TargetBlue, -1)
+					this.changeTargetCoveredCountForColor(color, -1)
 				}
 
 				this.tweens.add(Object.assign(
@@ -166,10 +186,10 @@ export default class Game extends Phaser.Scene
 					{
 						targets:box,
 						onComplete: () => {
-							const coveredTarget = this.hasTargetAt(box.x, box.y, Colors.TargetBlue)
+							const coveredTarget = this.hasTargetAt(box.x, box.y, color)
 							if (coveredTarget)
 							{
-								this.changeTargetCoveredCountForColor(Colors.TargetBlue,1)
+								this.changeTargetCoveredCountForColor(color,1)
 							}
 							console.dir(this.targetsCoveredByColor)
 						}
@@ -189,7 +209,7 @@ export default class Game extends Phaser.Scene
 
 		
 	}
-
+	// if the player stops moving stop the animation
 	private stopPlayerAnimation()
 	{
 		if (!this.player)
@@ -202,7 +222,7 @@ export default class Game extends Phaser.Scene
 			this.player.anims.play(`idle-${key}`, true)
 		}
 	}
-
+	//does the box hit the color
 	private changeTargetCoveredCountForColor(color: number, change: number)
 	{
 		if (!(color in this.targetsCoveredByColor))
@@ -212,12 +232,27 @@ export default class Game extends Phaser.Scene
 		this.targetsCoveredByColor[color] += change
 	}
 
-	private getBoxAt(x: number, y: number)
+	private getBoxDataAt(x: number, y: number)
 	{
-		return this.blueBoxes.find(box => {
-			const rect = box.getBounds()
-			return rect.contains(x, y)
-		})
+		const keys = Object.keys(this.boxesByColor)
+		for (let i = 0; i < keys.length; ++i )
+		{
+			const color = keys [i]
+			const box = this.boxesByColor[color].find(box =>{
+				const rect = box.getBounds()
+				return rect.contains(x, y)
+			})
+
+			if (!box)
+			{
+				continue
+			}
+			return {
+				box,
+				color: parseInt(color)
+			}
+		}
+		return undefined
 	}
 
 	// Dealing with not walking pass the other wall
