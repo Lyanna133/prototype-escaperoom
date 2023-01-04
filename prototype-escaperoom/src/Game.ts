@@ -3,7 +3,7 @@ import Phaser from 'phaser'
 export default class Game extends Phaser.Scene 
 {
 	private player?: Phaser.GameObjects.Sprite
-	private boxes?: Phaser.GameObjects.Sprite[] = []
+	private blueBoxes?: Phaser.GameObjects.Sprite[] = []
 	private layer?: Phaser.Tilemaps.StaticTilemapLayer 
 
 	private cursors?: Phaser.Types.Input.Keyboard.CursorKeys
@@ -57,7 +57,7 @@ export default class Game extends Phaser.Scene
 		
 		this.createPlayerAnims()
 
-		this.boxes = this.layer.createFromTiles(8, 0, {key: 'tiles', frame: 8 })
+		this.blueBoxes = this.layer.createFromTiles(8, 0, {key: 'tiles', frame: 8 })
 			.map(box => box.setOrigin(0))
 	}
 
@@ -161,7 +161,11 @@ export default class Game extends Phaser.Scene
 				this.tweens.add(Object.assign(
 					baseTween,
 					{
-						targets:box
+						targets:box,
+						onComplete: () => {
+							const coveredTarget = this.hasTargetAt(box.x, box.y, 51)
+							console.log(coveredTarget)
+						}
 					}
 				))
 			}
@@ -194,12 +198,13 @@ export default class Game extends Phaser.Scene
 
 	private getBoxAt(x: number, y: number)
 	{
-		return this.boxes.find(box => {
+		return this.blueBoxes.find(box => {
 			const rect = box.getBounds()
 			return rect.contains(x, y)
 		})
 	}
 
+	// Dealing with not walking pass the other wall
 	private hasWallAt(x: number, y: number)
 	{
 		if (!this.layer)
@@ -214,6 +219,19 @@ export default class Game extends Phaser.Scene
 		return tile.index === 100
 	}
 
+	private hasTargetAt(x: number, y: number, tileIndex: number )
+	{
+		if (!this.layer)
+		{
+			return false
+		}
+		const tile = this.layer.getTileAtWorldXY(x, y)
+		if (!tile)
+		{
+			return false
+		}
+		return tile.index === tileIndex
+	}
 
 	//player walking and idle animations
 	private createPlayerAnims()
