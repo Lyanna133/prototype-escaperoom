@@ -3,10 +3,12 @@ import Phaser from 'phaser'
 
 import * as Colors from '../src/consts/Color'
 
+import {boxColorToTargetColor} from '../src/utils/ColorUtils'
+
 export default class Game extends Phaser.Scene 
 {
 	private player?: Phaser.GameObjects.Sprite
-	// private blueBoxes: Phaser.GameObjects.Sprite[] = []
+	
 	private layer?: Phaser.Tilemaps.StaticTilemapLayer 
 
 	private targetsCoveredByColor: { [key: number]: number } = {}
@@ -174,11 +176,14 @@ export default class Game extends Phaser.Scene
 		if (boxData)
 			{
 				const box = boxData.box
-				const color = boxData.color
-				const coveredTarget = this.hasTargetAt(box.x, box.y, color)
+				const boxColor = boxData.color
+				const targetColor = boxColorToTargetColor(boxColor)
+
+
+				const coveredTarget = this.hasTargetAt(box.x, box.y, targetColor)
 				if(coveredTarget)
 				{
-					this.changeTargetCoveredCountForColor(color, -1)
+					this.changeTargetCoveredCountForColor(targetColor, -1)
 				}
 
 				this.tweens.add(Object.assign(
@@ -186,10 +191,10 @@ export default class Game extends Phaser.Scene
 					{
 						targets:box,
 						onComplete: () => {
-							const coveredTarget = this.hasTargetAt(box.x, box.y, color)
+							const coveredTarget = this.hasTargetAt(box.x, box.y, targetColor)
 							if (coveredTarget)
 							{
-								this.changeTargetCoveredCountForColor(color,1)
+								this.changeTargetCoveredCountForColor(targetColor,1)
 							}
 							console.dir(this.targetsCoveredByColor)
 						}
