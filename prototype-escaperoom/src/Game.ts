@@ -1,10 +1,15 @@
 import Phaser from 'phaser'
 // GEINDIGD BIJ PART 
+
+import * as Colors from '../src/consts/Color'
+
 export default class Game extends Phaser.Scene 
 {
 	private player?: Phaser.GameObjects.Sprite
 	private blueBoxes?: Phaser.GameObjects.Sprite[] = []
 	private layer?: Phaser.Tilemaps.StaticTilemapLayer 
+
+	private targetsCoveredByColor: { [key: number]: number } = {}
 
 	private cursors?: Phaser.Types.Input.Keyboard.CursorKeys
 	
@@ -130,15 +135,7 @@ export default class Game extends Phaser.Scene
 			})
 			
 		}
-		// else if (this.player.anims.currentAnim)
-		// {
-		// 	const key = this.player?.anims.currentAnim?.key
-		// 	if (!key.startsWith(`idle-`))
-		// 	{
-		// 		this.player.anims.play(`idle-${key}`, true)
-		// 	}
-			
-		// }
+	
 	}
 
 	private tweenMove(x: number, y: number, baseTween: any, onStart:() => void)
@@ -158,13 +155,23 @@ export default class Game extends Phaser.Scene
 		const box = this.getBoxAt(x, y)
 		if (box)
 			{
+				const coveredTarget = this.hasTargetAt(box.x, box.y, Colors.TargetBlue)
+				if(coveredTarget)
+				{
+					this.changeTargetCoveredCountForColor(Colors.TargetBlue, -1)
+				}
+
 				this.tweens.add(Object.assign(
 					baseTween,
 					{
 						targets:box,
 						onComplete: () => {
-							const coveredTarget = this.hasTargetAt(box.x, box.y, 51)
-							console.log(coveredTarget)
+							const coveredTarget = this.hasTargetAt(box.x, box.y, Colors.TargetBlue)
+							if (coveredTarget)
+							{
+								this.changeTargetCoveredCountForColor(Colors.TargetBlue,1)
+							}
+							console.dir(this.targetsCoveredByColor)
 						}
 					}
 				))
@@ -194,6 +201,15 @@ export default class Game extends Phaser.Scene
 		{
 			this.player.anims.play(`idle-${key}`, true)
 		}
+	}
+
+	private changeTargetCoveredCountForColor(color: number, change: number)
+	{
+		if (!(color in this.targetsCoveredByColor))
+		{
+			this.targetsCoveredByColor[color] = 0
+		}
+		this.targetsCoveredByColor[color] += change
 	}
 
 	private getBoxAt(x: number, y: number)
