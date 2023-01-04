@@ -2,8 +2,10 @@ import Phaser from 'phaser'
 // GEINDIGD BIJ PART 
 
 import * as Colors from '../src/consts/Color'
+import {Direction} from '../src/consts/Direction'
 
 import {boxColorToTargetColor} from '../src/utils/ColorUtils'
+import {offsetForDirection} from '../src/utils/TileUtils'
 
 export default class Game extends Phaser.Scene 
 {
@@ -90,7 +92,7 @@ export default class Game extends Phaser.Scene
 				duration: 500
 			}
 
-			this.tweenMove(this.player.x - 31, this.player.y + 32, baseTween,() => {
+			this.tweenMove(Direction.Left, baseTween,() => {
 				this.player.anims.play('left', true)
 			} )
 		}
@@ -102,7 +104,7 @@ export default class Game extends Phaser.Scene
 				duration: 500
 			}
 
-			this.tweenMove(this.player.x + 95, this.player.y + 32, baseTween, () => {
+			this.tweenMove(Direction.Right, baseTween, () => {
 				this.player.anims.play('right', true)
 			})
 
@@ -118,7 +120,7 @@ export default class Game extends Phaser.Scene
 				duration: 500
 			}
 
-			this.tweenMove(this.player.x + 32, this.player.y - 32, baseTween, () => {
+			this.tweenMove(Direction.Up, baseTween, () => {
 				this.player.anims.play('up', true)
 			})
 			
@@ -132,7 +134,7 @@ export default class Game extends Phaser.Scene
 				duration: 500
 			}
 
-			this.tweenMove(this.player.x + 32, this.player.y + 95, baseTween, () => {
+			this.tweenMove(Direction.Down, baseTween, () => {
 				this.player.anims.play('down', true)
 			})
 			
@@ -158,23 +160,44 @@ export default class Game extends Phaser.Scene
 		console.dir(this.boxesByColor)
 	}
 
-	private tweenMove(x: number, y: number, baseTween: any, onStart:() => void)
+	private tweenMove(direction: Direction, baseTween: any, onStart:() => void)
 	{
-		if(this.tweens.isTweening(this.player!))
+		if( !this.player || this.tweens.isTweening(this.player!))
 		{
 			return
 		}
 
-		const hasWall = this.hasWallAt(x,y)
+		const x = this.player.x
+		const y = this.player.y
+
+		const offset = offsetForDirection(direction)
+		const ox = x + offset.x 
+		const oy = y + offset.y
+
+		const hasWall = this.hasWallAt(ox,oy)
 
 			if (hasWall)
 			{
 				return
 			}
 
-		const boxData = this.getBoxDataAt(x, y)
+		const boxData = this.getBoxDataAt(ox, oy)
 		if (boxData)
 			{
+				const nextOffset = offsetForDirection(direction, 2)
+				const nx = x + nextOffset.x 
+				const ny = y + nextOffset.y
+				const nextBoxData = this.getBoxDataAt(nx,ny)
+				if (nextBoxData)
+				{
+					return
+				}
+
+				if (this.hasWallAt(nx, ny))
+				{
+					return
+				}
+
 				const box = boxData.box
 				const boxColor = boxData.color
 				const targetColor = boxColorToTargetColor(boxColor)
