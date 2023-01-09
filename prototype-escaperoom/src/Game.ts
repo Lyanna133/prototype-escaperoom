@@ -1,6 +1,4 @@
 import Phaser from 'phaser'
-// GEINDIGD BIJ PART  
-// PART 10 ABOUT STYLING, PRELOADER + RETRY BUTTON
 
 import * as Colors from '../src/consts/Color'
 import {Direction} from '../src/consts/Direction'
