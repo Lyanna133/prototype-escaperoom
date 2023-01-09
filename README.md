@@ -84,7 +84,8 @@ Instaleer project via [@Github](https://github.com/Lyanna133/prototype-escaperoo
 ```
 ## Screenshots
 
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+![App Screenshot](Screenshotgame<img width="640" alt="Screenshotgame" src="https://user-images.githubusercontent.com/103851643/211283409-558f1878-94b2-4c56-bb4c-11a9196ff9e5.png">
+)
 
 
 
