@@ -12,7 +12,7 @@ en hier verder aan te kunnen werken.
 ## Auteurs
 
 
-- [@Anouk Wijnen](https://github.com/Lyanna133)
+- [@Anouk](https://github.com/Lyanna133)
 
 
 
