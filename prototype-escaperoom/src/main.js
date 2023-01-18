@@ -7,7 +7,7 @@ import LevelFinishedScene from './LevelFinishedScene'
 
 const config = {
 	type: Phaser.AUTO,
-	parent: 'app',
+	parent: 'phaser',
 	width: 640,
 	height: 512,
 	physics: {
