@@ -14,12 +14,17 @@ export default class LevelFinishedScene extends Phaser.Scene
 
         
         this.add.text( width * 0.5, height * 0.5, 'Level Complete!', {
+            fontFamily: 'Righteous',
+            color: '#4dbbfa',
             fontSize: 48
         }) 
         .setOrigin(0.5)
         
-        this.add.text(width * 0.5, height * 0.6,`Moves: ${data.moves}` )
-            .setOrigin(0.5)
+        this.add.text(width * 0.5, height * 0.6,`Moves: ${data.moves}`,{
+            fontFamily: 'Poppins',
+        }
+         )
+        .setOrigin(0.5)
     }
     
 }

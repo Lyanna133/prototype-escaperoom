@@ -77,7 +77,9 @@ export default class Game extends Phaser.Scene
 		this.extractBoxes(this.layer)
 
 		//show number off moves
-		this.movesCountLabel = this.add.text( 540, 10, `Moves: ${this.movesCount}`)
+		this.movesCountLabel = this.add.text( 540, 10, `Moves: ${this.movesCount}`,{
+			fontFamily: 'Poppins'
+		})
 	}
 
 	update()

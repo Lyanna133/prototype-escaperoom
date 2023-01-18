@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 
+import Preloader from './Preloader'
 import Game from './Game'
 import LevelFinishedScene from './LevelFinishedScene'
 
@@ -15,7 +16,7 @@ const config = {
 			gravity: { y: 200 },
 		},
 	},
-	scene: [Game, LevelFinishedScene]
+	scene: [Preloader, Game, LevelFinishedScene]
 }
 
 export default new Phaser.Game(config)
