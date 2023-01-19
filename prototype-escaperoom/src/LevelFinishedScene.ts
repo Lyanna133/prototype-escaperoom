@@ -30,6 +30,9 @@ export default class LevelFinishedScene extends Phaser.Scene
 
         const retrybutton = primaryButton(`Retry`) as HTMLElement
         this.add.dom(width * 0.5, height * 0.6, retrybutton)
+            .addListener('click').once('click', () => {
+                this.scene.start('game')
+            })
     }
 
     
