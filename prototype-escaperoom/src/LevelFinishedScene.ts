@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 
-import {primaryButton} from './ui/Button'
+import {defaultButton, primaryButton} from './ui/Button'
 
 export default class LevelFinishedScene extends Phaser.Scene
 {
@@ -9,8 +9,9 @@ export default class LevelFinishedScene extends Phaser.Scene
         super('level-finished')
     }
 
-    create(data: {moves:number } = {moves: 0})
+    create(d: {moves: number, currentLevel: number } )
     {
+        const data = Object.assign({ moves: 0, currentLevel: 1 },d)
         const width = this.scale.width
         const height = this.scale.height
 
@@ -28,10 +29,16 @@ export default class LevelFinishedScene extends Phaser.Scene
          )
         .setOrigin(0.5)
 
-        const retrybutton = primaryButton(`Retry`) as HTMLElement
-        this.add.dom(width * 0.5, height * 0.6, retrybutton)
+        const retrybutton = defaultButton(`Retry`) as HTMLElement
+        this.add.dom(width * 0.25, height * 0.6, retrybutton)
             .addListener('click').once('click', () => {
-                this.scene.start('game')
+                this.scene.start('game', {level: data.currentLevel })
+            })
+
+        const nextLevelButton = primaryButton('Next Level') as HTMLElement
+        this.add.dom(width * 0.75, height * 0.6, nextLevelButton)
+            .addListener('click').once('click', () => {
+                this.scene.start('game', {level: data.currentLevel + 1 })
             })
     }
 

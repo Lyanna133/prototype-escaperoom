@@ -8,6 +8,15 @@ const primaryButton = (text = 'Play') => {
     )
 }
 
+const defaultButton = (text = 'Play') => {
+    return (
+        <button class="button is-medium">
+            { text }
+	    </button>
+    )
+}
+
 export {
+    defaultButton,
     primaryButton
 }
