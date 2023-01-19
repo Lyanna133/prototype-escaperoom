@@ -8,6 +8,9 @@ import LevelFinishedScene from './LevelFinishedScene'
 const config = {
 	type: Phaser.AUTO,
 	parent: 'phaser',
+	dom: {
+		createContainer: true
+	},
 	width: 640,
 	height: 512,
 	physics: {
