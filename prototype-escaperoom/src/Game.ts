@@ -9,6 +9,7 @@ import {baseTweenForDirection} from '../src/utils/TweenUtils'
 
 import level1 from '../src/levels/level1'
 import level2 from '../src/levels/level2'
+import level3 from '../src/levels/level3'
 
 export default class Game extends Phaser.Scene 
 {
@@ -26,7 +27,8 @@ export default class Game extends Phaser.Scene
 
 	private levels = [
 		level1,
-		level2
+		level2,
+		level3
 	]
 	
 	constructor() {
